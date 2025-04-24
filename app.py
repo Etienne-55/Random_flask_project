@@ -1,12 +1,14 @@
-from flask import Flask
-from flask_sqlalchemy import SQLAlchemy
+from flask import Flask, request
 from flask_jwt_extended import JWTManager
+from models import User
 from config import Config 
 from flask_migrate import Migrate
+from extensions import db
+from werkzeug.security import generate_password_hash
 
 migrate = Migrate()
-db = SQLAlchemy()
 jwt = JWTManager()
+
 
 def create_app():
     app = Flask(__name__)
@@ -19,10 +21,21 @@ def create_app():
     @app.route('/')
     def hello():
         return "Hello World from rapsberry" 
+    
+    @app.route('/register-user', methods=['POST'])
+    def RegisterUser():
+        data = request.get_json()
 
-    @app.route('/first-route')
-    def first_route():
-        return "testinf route"
+        if User.query.filter_by(email=data['email']).first():
+            return {'message': 'Email already registered'}, 400
+
+        hashed_password = generate_password_hash(data['password'])
+        new_user = User(email=data['email'], password=hashed_password, is_admin=False)
+
+        db.session.add(new_user)
+        db.session.commit()
+
+        return {'message': 'User created successfully'}, 201
 
     with app.app_context():
         db.create_all()
