@@ -1,10 +1,10 @@
 from flask import Flask, request
-from flask_jwt_extended import JWTManager
+from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity
 from models import User
 from config import Config 
 from flask_migrate import Migrate
 from extensions import db
-from werkzeug.security import generate_password_hash
+from werkzeug.security import generate_password_hash, check_password_hash
 
 migrate = Migrate()
 jwt = JWTManager()
@@ -36,6 +36,19 @@ def create_app():
         db.session.commit()
 
         return {'message': 'User created successfully'}, 201
+
+    @app.route('/login', methods=['POST'])
+    def Login():
+        data = request.get_json()
+        user = User.query.filter_by(email=data['email']).first()
+
+        if not user or not check_password_hash(user.password, data['password']):
+            return{'message': 'Invalid credentials'}, 401
+
+        access_token = create_access_token(identity=str(user.id))
+        return{
+            'access token': access_token,
+        }, 200
 
     with app.app_context():
         db.create_all()
