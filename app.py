@@ -19,9 +19,17 @@ def create_app():
     jwt.init_app(app)
 
     @app.route('/')
-    def hello():
-        return render_template('register.html')
+    def Landing_Page_Template():
+        return render_template('landing_page.html')
     
+    @app.route('/hello_raspberry')
+    def Hello_Word_Raspberry():
+        return "Hello world from raspberry"
+
+    @app.route('/register')
+    def RegisterUser_Template():
+        return render_template('register.html')
+
     @app.route('/register-user', methods=['POST'])
     def RegisterUser():
         data = request.get_json()
