@@ -1,0 +1,117 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>User Registration</title>
+    <style>
+        body {
+            font-family: Arial, sans-serif;
+            max-width: 500px;
+            margin: 0 auto;
+            padding: 20px;
+        }
+        .form-group {
+            margin-bottom: 15px;
+        }
+        label {
+            display: block;
+            margin-bottom: 5px;
+        }
+        input[type="email"],
+        input[type="password"] {
+            width: 100%;
+            padding: 8px;
+            border: 1px solid #ddd;
+            border-radius: 4px;
+        }
+        button {
+            background-color: #4CAF50;
+            color: white;
+            padding: 10px 15px;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+        button:hover {
+            background-color: #45a049;
+        }
+        .message {
+            margin-top: 20px;
+            padding: 10px;
+            border-radius: 4px;
+        }
+        .success {
+            background-color: #d4edda;
+            color: #155724;
+        }
+        .error {
+            background-color: #f8d7da;
+            color: #721c24;
+        }
+    </style>
+</head>
+<body>
+    <h1>User Registration</h1>
+    
+    <div id="message-container"></div>
+    
+    <form id="registration-form">
+        <div class="form-group">
+            <label for="email">Email:</label>
+            <input type="email" id="email" required>
+        </div>
+        
+        <div class="form-group">
+            <label for="password">Password:</label>
+            <input type="password" id="password" required>
+        </div>
+        
+        <button type="submit">Register</button>
+    </form>
+
+    <script>
+        document.getElementById('registration-form').addEventListener('submit', async (e) => {
+            e.preventDefault();
+            
+            const email = document.getElementById('email').value;
+            const password = document.getElementById('password').value;
+            
+            try {
+                const response = await fetch('/register-user', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    },
+                    body: JSON.stringify({ email, password })
+                });
+                
+                const data = await response.json();
+                const messageContainer = document.getElementById('message-container');
+                
+                if (response.ok) {
+                    messageContainer.innerHTML = `
+                        <div class="message success">
+                            ${data.message}
+                        </div>
+                    `;
+                    document.getElementById('registration-form').reset();
+                } else {
+                    messageContainer.innerHTML = `
+                        <div class="message error">
+                            ${data.message}
+                        </div>
+                    `;
+                }
+            } catch (error) {
+                document.getElementById('message-container').innerHTML = `
+                    <div class="message error">
+                        An error occurred. Please try again.
+                    </div>
+                `;
+                console.error('Error:', error);
+            }
+        });
+    </script>
+</body>
+</html>

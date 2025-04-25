@@ -1,4 +1,4 @@
-from flask import Flask, request
+from flask import Flask, request, jsonify, render_template
 from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity
 from models import User
 from config import Config 
@@ -20,7 +20,7 @@ def create_app():
 
     @app.route('/')
     def hello():
-        return "Hello World from rapsberry" 
+        return render_template('register.html')
     
     @app.route('/register-user', methods=['POST'])
     def RegisterUser():
@@ -35,7 +35,7 @@ def create_app():
         db.session.add(new_user)
         db.session.commit()
 
-        return {'message': 'User created successfully'}, 201
+        return jsonify({'message': 'User created successfully'}), 201
 
     @app.route('/login', methods=['POST'])
     def Login():
@@ -43,12 +43,10 @@ def create_app():
         user = User.query.filter_by(email=data['email']).first()
 
         if not user or not check_password_hash(user.password, data['password']):
-            return{'message': 'Invalid credentials'}, 401
+            return jsonify({'message': 'Invalid credentials'}), 401
 
         access_token = create_access_token(identity=str(user.id))
-        return{
-            'access token': access_token,
-        }, 200
+        return jsonify({'access token': access_token}), 200
 
     with app.app_context():
         db.create_all()
