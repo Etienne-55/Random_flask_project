@@ -34,6 +34,10 @@ def create_app():
     def Login_Template():
         return render_template('login.html')
 
+    @app.route('/post_dashboard')
+    def post_dashboard_template():
+        return render_template('post_dashboard.html')
+
     @app.route('/register-user', methods=['POST'])
     def RegisterUser():
         data = request.get_json()

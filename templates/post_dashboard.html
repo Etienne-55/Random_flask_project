@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang"eng">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width", initial-scale=1.0>
+    <title>Post_Dashboard</title>
+    <style>
+	body {
+	    font-family: Arial, sans-serif;
+	    line-height: 1.6;
+	    margin: 0;
+	    padding: 0;
+	    background-color: #f5f5f5;
+	}
+	header {
+	    background-color: #4CAF50;
+	    color: white;
+	    padding: 1rem;
+	    display: flex;
+	    justify-content: space-between;
+	    align-items: center;
+	}
+	.container {
+	    max-width: 8000x;
+	    margin: 0 auto;
+	    padding: 1rem;
+	}
+	.post-form {
+	    background-color: white;
+	    padding: 1.5rem;
+	    border-radius: 8px;
+	    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	    margin-botton: 2rem;
+	}
+	textarea {
+	    width: 100%;
+	    padding: 0.75rem;
+	    border: 1px splid #ddd;
+	    border-radius: 4px;
+	    resize: vertical;
+	    min-height: 100px;
+	    box-sizing: border-box;
+	}
+	button {
+	    padding: 0.75rem 1.5rem;
+	    background-color: #4CAF50;
+	    color: white;
+	    border: none;
+	    border-radius: 4px;
+	    cursor: pointer;
+	    font-size: 1rem;
+	    margin-top: 0.5rem;
+	}
+	button:hover {
+	    background-color: #45a049;
+	}
+	.posts-container {
+	    margin-top: 2rem;
+	}
+	.post {
+	    background-color: white;
+	    padding: 1.5rem;
+	    border-radius: 8px;
+	    box-shadow: 0 2px 4px rgba (0, 0, 0, 0.1);
+	    margin-botton: 1rem;
+	}
+	.post {
+	    background-color: white;
+	    padding: 1.5rem;
+	    border-radius: 8px;
+	    box-shadow: 0 2px 4px rgba (0, 0, 0, 0.1);
+	}
+	.post-content {
+	    margin-botton: 0.5rem;
+	}
+	.post-meta {
+	    font-size: 0.8rem;
+	    color #777;
+	}
+	.logout-btn {
+	    background-color: transparent;
+	    border: 1px solid white;
+	    padding: 0.5rem 1rem;
+	}
+	.admin-painel {
+	    display: none;
+	    background-color: #f0f8ff;
+	    padding: 1rem;
+	    border-radius: 8px;
+	    margin-botton: 1rem;
+	    border-left: 4px solid #4169e1;
+	}
+	@media (max-width: 600px) {
+	    .container {
+		padding: 0.5rem;
+	    }
+	}
+    </style>
+</head>
+<body>
+    <header>
+	<h1>Post_Dashboard</h1>
+	<button id="logout-btn" class="logout-btn">Logout</button>
+    </header>
+
+    <div class="container">
+	<div id="admin-panel" class "admin-panel">
+	    <h2>Admin Panel</h2>
+	    <p>You have admin privileges</p>
+	</div>
+
+	<div class"post-from">
+	    <h2>Create New Post</h2>
+	    <form id="post-form">
+		<div>
+		    <textarea id="post-content" placeholder="What's on your mind?" required></textarea>
+		</div>
+		<button type="submit">Post</button>
+	    </form>
+	</div>
+
+	<div class="posts-container" id="posts-container">
+	    <h2>Recent Posts</h2>
+	</div>
+
+    </div>
+
+    <script>
+	document.addEventListener('DOMContentLoaded', function() {
+	    const token = localStorage.getItem('accessToken');
+	    if (!token) {
+		window.location.href = '/login.html';
+		return;
+	    }
+	
+	    const isAdmin = localStorage.getItem('isAdmin') === 'true';
+	    if (isAdmin) {
+		document.getElementById('admin-panel')style.display = 'block';
+	    }
+
+	    loadPosts();
+	});
+
+	document.getElementById('logout-btn').addEventListener('click', function() {
+	    localStorage.removeItem('accessToken');
+	    localStorage.removeItem('isAdmin');
+	    window.location.href = '/login.html';
+	});
+
+	document.getElementById('post-form').addEventListener('submit', async function(e) {
+	    e.preventDefault();
+	    
+	    const content = document.getElementById('post-content').value;
+	    const token = localStorage.getItem('accessToken');
+
+	    try {
+		const response = await fetch('/posts', {
+		    method 'POST',
+		    headers: {
+			'Content-Type': 'application/json',
+			'authorization': `Bearer ${token}`
+		    },
+		    body: JSON.stringify({ content }),
+		});
+
+		if (response.ok) {
+		    document.getElementById('post-content').value = '';
+		    loadPosts();
+		} else {
+		    const data = await response.json();
+		    console.error('Error creating post:' data.message);
+		    if ( response.status ==== 401) {
+		 	localStorage.removeItem('accessToken');
+			window.location.href = '/login.html';
+		    }
+		}
+	    } catch (error) {
+		console.error('Error creating post:', error);
+	    }
+	});
+	
+	async function loadPosts() {
+	    const token = LocalStorage.getItem('accessToken');
+	    const postsContainer = document.getElementById('posts-container');
+	
+	    try {
+		const response = await fetch('/posts', {
+		    headers: {
+			'Authorization': `Bearer ${token}`
+		    }
+		});
+		
+		if (response.ok) {
+		    const posts = await response.json();
+
+		    while (postContainer.children.lenght > 1) {
+			postsContainer.removeChild(postsContainer.lastChild);
+		    }
+
+		    posts.forEach(post => {
+			const postElement = document.createElement('div');
+			postElement.className = 'post';
+
+			const contentElement = document.createElement('div');
+			contentElement.className = 'post-content';
+			contentElement.textContent = post.content;
+
+			const metaElement = document.createElement('div');
+			metaElement.className = 'post-meta';
+
+			const date = new Date(post.created_at);
+			metaElement.textContent = `Posted on ${date.toLocalDateString()} at ${date.toLocaleTimeString()}`;
+
+			postElement.appendChild(contentElement);
+			postELement.appendChild(metaElement);
+			postContainer.appendChild(postElement);
+		    });
+		} else {
+		    if (response.status === 401 {
+			localStorage.removeItem('accessToken');
+			window.location.href = '/login.html';
+		    }
+		}
+	    } catch (error) {
+		console.error('Error loading posts:', error);
+	    }
+	}
+    </scrtips>
+</body>
+</html>
+		    
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+	
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+ 	   
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+		
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
