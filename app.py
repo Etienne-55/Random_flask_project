@@ -30,6 +30,10 @@ def create_app():
     def RegisterUser_Template():
         return render_template('register.html')
 
+    @app.route('/login')
+    def Login_Template():
+        return render_template('login.html')
+
     @app.route('/register-user', methods=['POST'])
     def RegisterUser():
         data = request.get_json()
@@ -45,7 +49,7 @@ def create_app():
 
         return jsonify({'message': 'User created successfully'}), 201
 
-    @app.route('/login', methods=['POST'])
+    @app.route('/login-user', methods=['POST'])
     def Login():
         data = request.get_json()
         user = User.query.filter_by(email=data['email']).first()
@@ -54,7 +58,10 @@ def create_app():
             return jsonify({'message': 'Invalid credentials'}), 401
 
         access_token = create_access_token(identity=str(user.id))
-        return jsonify({'access token': access_token}), 200
+        return jsonify({
+            'access token': access_token,
+            'is_admin': user.is_admin,
+        }), 200
 
     with app.app_context():
         db.create_all()
