@@ -1,6 +1,6 @@
 from flask import Flask, request, jsonify, render_template
-from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity
-from models import User
+from flask_jwt_extended import JWTManager, create_access_token, get_jwt_identity, jwt_required, current_user
+from models import User, Post
 from config import Config 
 from flask_migrate import Migrate
 from extensions import db
@@ -69,6 +69,29 @@ def create_app():
 
     with app.app_context():
         db.create_all()
+
+    @app.route('/posts', methods=['GET'])
+    @jwt_required()
+    def get_posts():
+        current_user_id = get_jwt_identity()
+        posts = Post.query.filter_by(user_id=current_user_id).order_by(Post.id.desc()).all()
+
+        return jsonify([{
+            'id': post.id,
+            'content': post.content
+        } for post in posts]), 200
+
+    @app.route('/posts', methods=['POST'])
+    @jwt_required()
+    def create_post():
+        user_id = get_jwt_identity()
+        data = request.get_json()
+        new_post = Post(content=data['content'], user_id=user_id)
+
+        db.session.add(new_post)
+        db.session.commit()
+
+        return jsonify({'message': 'Post created'}), 201
 
     return app
 
