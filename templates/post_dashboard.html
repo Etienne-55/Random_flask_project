@@ -1,8 +1,8 @@
 <!DOCTYPE html>
-<html lang"eng">
+<html lang="eng">
 <head>
     <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width", initial-scale=1.0>
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Post_Dashboard</title>
     <style>
 	body {
@@ -21,7 +21,7 @@
 	    align-items: center;
 	}
 	.container {
-	    max-width: 8000x;
+	    max-width: 800px;
 	    margin: 0 auto;
 	    padding: 1rem;
 	}
@@ -30,12 +30,12 @@
 	    padding: 1.5rem;
 	    border-radius: 8px;
 	    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
-	    margin-botton: 2rem;
+	    margin-bottom: 2rem;
 	}
 	textarea {
 	    width: 100%;
 	    padding: 0.75rem;
-	    border: 1px splid #ddd;
+	    border: 1px solid #ddd;
 	    border-radius: 4px;
 	    resize: vertical;
 	    min-height: 100px;
@@ -61,33 +61,27 @@
 	    background-color: white;
 	    padding: 1.5rem;
 	    border-radius: 8px;
-	    box-shadow: 0 2px 4px rgba (0, 0, 0, 0.1);
-	    margin-botton: 1rem;
-	}
-	.post {
-	    background-color: white;
-	    padding: 1.5rem;
-	    border-radius: 8px;
-	    box-shadow: 0 2px 4px rgba (0, 0, 0, 0.1);
+	    box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+	    margin-bottom: 1rem;
 	}
 	.post-content {
-	    margin-botton: 0.5rem;
+	    margin-bottom 0.5rem;
 	}
 	.post-meta {
 	    font-size: 0.8rem;
-	    color #777;
+	    color: #777;
 	}
 	.logout-btn {
 	    background-color: transparent;
 	    border: 1px solid white;
 	    padding: 0.5rem 1rem;
 	}
-	.admin-painel {
+	.admin-panel {
 	    display: none;
 	    background-color: #f0f8ff;
 	    padding: 1rem;
 	    border-radius: 8px;
-	    margin-botton: 1rem;
+	    margin-bottom: 1rem;
 	    border-left: 4px solid #4169e1;
 	}
 	@media (max-width: 600px) {
@@ -104,12 +98,12 @@
     </header>
 
     <div class="container">
-	<div id="admin-panel" class "admin-panel">
+	<div id="admin-panel" class="admin-panel">
 	    <h2>Admin Panel</h2>
 	    <p>You have admin privileges</p>
 	</div>
 
-	<div class"post-from">
+	<div class="post-form">
 	    <h2>Create New Post</h2>
 	    <form id="post-form">
 		<div>
@@ -135,7 +129,7 @@
 	
 	    const isAdmin = localStorage.getItem('isAdmin') === 'true';
 	    if (isAdmin) {
-		document.getElementById('admin-panel')style.display = 'block';
+		document.getElementById('admin-panel').style.display = 'block';
 	    }
 
 	    loadPosts();
@@ -155,7 +149,7 @@
 
 	    try {
 		const response = await fetch('/posts', {
-		    method 'POST',
+		    method: 'POST',
 		    headers: {
 			'Content-Type': 'application/json',
 			'authorization': `Bearer ${token}`
@@ -168,10 +162,10 @@
 		    loadPosts();
 		} else {
 		    const data = await response.json();
-		    console.error('Error creating post:' data.message);
-		    if ( response.status ==== 401) {
+		    console.error('Error creating post:', data.message);
+		    if ( response.status === 401) {
 		 	localStorage.removeItem('accessToken');
-			window.location.href = '/login.html';
+			window.location.href = '/login';
 		    }
 		}
 	    } catch (error) {
@@ -180,7 +174,7 @@
 	});
 	
 	async function loadPosts() {
-	    const token = LocalStorage.getItem('accessToken');
+	    const token = localStorage.getItem('accessToken');
 	    const postsContainer = document.getElementById('posts-container');
 	
 	    try {
@@ -193,7 +187,7 @@
 		if (response.ok) {
 		    const posts = await response.json();
 
-		    while (postContainer.children.lenght > 1) {
+		    while (postsContainer.children.length > 1) {
 			postsContainer.removeChild(postsContainer.lastChild);
 		    }
 
@@ -209,14 +203,14 @@
 			metaElement.className = 'post-meta';
 
 			const date = new Date(post.created_at);
-			metaElement.textContent = `Posted on ${date.toLocalDateString()} at ${date.toLocaleTimeString()}`;
+			metaElement.textContent = `Posted on ${date.toLocaleDateString()} at ${date.toLocaleTimeString()}`;
 
 			postElement.appendChild(contentElement);
-			postELement.appendChild(metaElement);
-			postContainer.appendChild(postElement);
+			postElement.appendChild(metaElement);
+			postsContainer.appendChild(postElement);
 		    });
 		} else {
-		    if (response.status === 401 {
+		    if (response.status === 401) {
 			localStorage.removeItem('accessToken');
 			window.location.href = '/login.html';
 		    }
@@ -225,150 +219,6 @@
 		console.error('Error loading posts:', error);
 	    }
 	}
-    </scrtips>
+    </script>
 </body>
 </html>
-		    
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-	
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
- 	   
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-		
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-

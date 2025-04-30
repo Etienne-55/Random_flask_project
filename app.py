@@ -78,7 +78,9 @@ def create_app():
 
         return jsonify([{
             'id': post.id,
-            'content': post.content
+            'content': post.content,
+            'created_at': post.created_at.isoformat() if hasattr(post, 'created_at') else None,
+            'user_id': post.user_id,
         } for post in posts]), 200
 
     @app.route('/posts', methods=['POST'])
@@ -86,12 +88,20 @@ def create_app():
     def create_post():
         user_id = get_jwt_identity()
         data = request.get_json()
-        new_post = Post(content=data['content'], user_id=user_id)
 
+        new_post = Post(content=data['content'], user_id=user_id)
         db.session.add(new_post)
         db.session.commit()
 
-        return jsonify({'message': 'Post created'}), 201
+        return jsonify({
+            'message': 'Post created',
+            'post': {
+                'id': new_post.id,
+                'content': new_post.content,
+                'user_id': new_post.user_id,
+                'created_at': new_post.created_at.isoformat() if hasattr(new_post, 'created_at') else None,
+            }
+        }), 201
 
     return app
 
